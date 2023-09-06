@@ -147,7 +147,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public BankResponse debitAccount(CreditDebitRequest request) {
-        //check if the acount exist
+        //check if the account exist
         //check if the amount you intend to withdraw is not more than the current account balance
         boolean isAccountExist = userRepository.existsByAccountNumber(request.getAccountNumber());
         if (!isAccountExist) {
@@ -189,6 +189,61 @@ public class UserServiceImpl implements UserService {
                         .accountName(userToDebit.getFirstName() + " " + userToDebit.getLastName() + " " + userToDebit.getOtherName())
                         .accountBalance(userToDebit.getAccountBalance())
                         .build())
+                .build();
+    }
+
+    @Override
+    public BankResponse transfer(TransferRequest request) {
+        //get the account to debit
+        //check if the amount I'm debiting is not more the current balance
+        //check if the destination accounts exist
+        // check if the source account is empty
+        boolean isDestinationAccountNumberExist = userRepository.existsByAccountNumber(request.getDestinationAccountNumber());
+        if (!isDestinationAccountNumberExist) {
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
+                    .accountInfo(null)
+                    .build();
+        }
+        User sourceAccountUser = userRepository.findByAccountNumber(request.getSourceAccountNumber());
+        //BigInteger senderBalance = sourceAccountUser.getAccountBalance().toBigInteger();
+        if(request.getAmount().compareTo(sourceAccountUser.getAccountBalance()) > 0){
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.INSUFFICIENT_BALANCE_CODE)
+                    .responseMessage(AccountUtils.INSUFFICIENT_BALANCE_MESSAGE)
+                    .accountInfo(null)
+                    .build();
+        }
+
+        User destinationAccountUser = userRepository.findByAccountNumber(request.getDestinationAccountNumber());
+        //BigInteger debitAmount = request.getAmount().toBigInteger();
+        destinationAccountUser.setAccountBalance(destinationAccountUser.getAccountBalance().add(request.getAmount()));
+        userRepository.save(destinationAccountUser);
+        String sourceUsername = sourceAccountUser.getFirstName() +" "+ sourceAccountUser.getLastName();
+//         recipient = destinationAccountUser.getFirstName() +" "+ destinationAccountUser.getLastName();
+        EmailDetails creditAlert = EmailDetails.builder()
+                .subject("CREDIT ALERT")
+                .recipient(destinationAccountUser.getEmail())
+                .messageBody("The sum of " + request.getAmount() + " has been transferred to your account from "+ sourceUsername +
+                        " your new balance is " + destinationAccountUser.getAccountBalance())
+                .build();
+        emailService.sendEmailAlert(creditAlert);
+
+        sourceAccountUser.setAccountBalance(sourceAccountUser.getAccountBalance().subtract(request.getAmount()));
+
+        userRepository.save(sourceAccountUser);
+        EmailDetails debitAlert = EmailDetails.builder()
+                .subject("DEBIT ALERT")
+                .recipient(sourceAccountUser.getEmail())
+                .messageBody("The sum of " + request.getAmount() + " has been deducted from your account!" +
+                        " your new balance is " + sourceAccountUser.getAccountBalance())
+                .build();
+        emailService.sendEmailAlert(debitAlert);
+        return BankResponse.builder()
+                .responseCode(AccountUtils.TRANSFER_SUCCESS_CODE)
+                .responseMessage(AccountUtils.TRANSFER_SUCCESS_MESSAGE)
+                .accountInfo(null)
                 .build();
     }
 }

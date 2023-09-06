@@ -1,9 +1,6 @@
 package com.gsuretech.gsuretechbank.controller;
 
-import com.gsuretech.gsuretechbank.dto.BankResponse;
-import com.gsuretech.gsuretechbank.dto.CreditDebitRequest;
-import com.gsuretech.gsuretechbank.dto.EnquiryRequest;
-import com.gsuretech.gsuretechbank.dto.UserRequest;
+import com.gsuretech.gsuretechbank.dto.*;
 import com.gsuretech.gsuretechbank.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -59,13 +56,42 @@ public class UserController {
         return userService.nameEnquiry(enquiryRequest);
     }
 
+    @Operation(
+            summary = "Credit an Account",
+            description = "Given an account number, and amount, the account would be funded"
+    )
+    @ApiResponse(
+            responseCode = "201",
+            description = "HTTP Status 200 CREATED"
+    )
     @PostMapping("/credit")
     public BankResponse creditAccount(@RequestBody CreditDebitRequest request){
         return userService.creditAccount(request);
     }
 
+    @Operation(
+            summary = "Debit an Account",
+            description = "Given an account number, and amount, the account would be debited"
+    )
+    @ApiResponse(
+            responseCode = "201",
+            description = "HTTP Status 200 CREATED"
+    )
     @PostMapping("/debit")
     public BankResponse debitAccount(@RequestBody CreditDebitRequest request){
         return userService.debitAccount(request);
+    }
+
+    @Operation(
+            summary = "Transfer to an Account",
+            description = "Given an account number, and amount, the account would be funded"
+    )
+    @ApiResponse(
+            responseCode = "201",
+            description = "HTTP Status 200 CREATED"
+    )
+    @PostMapping("/transfer")
+    public BankResponse transer(@RequestBody TransferRequest request){
+        return userService.transfer(request);
     }
 }
