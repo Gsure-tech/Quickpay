@@ -1,9 +1,6 @@
 package com.gsuretech.gsuretechbank.controller;
 
-import com.gsuretech.gsuretechbank.dto.BankResponse;
-import com.gsuretech.gsuretechbank.dto.CreditDebitRequest;
-import com.gsuretech.gsuretechbank.dto.EnquiryRequest;
-import com.gsuretech.gsuretechbank.dto.UserRequest;
+import com.gsuretech.gsuretechbank.dto.*;
 import com.gsuretech.gsuretechbank.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -38,5 +35,10 @@ public class UserController {
     @PostMapping("/debit")
     public BankResponse debitAccount(@RequestBody CreditDebitRequest request){
         return userService.debitAccount(request);
+    }
+
+    @PostMapping("/transfer")
+    public BankResponse transer(@RequestBody TransferRequest request){
+        return userService.transfer(request);
     }
 }

@@ -1,9 +1,6 @@
 package com.gsuretech.gsuretechbank.service;
 
-import com.gsuretech.gsuretechbank.dto.BankResponse;
-import com.gsuretech.gsuretechbank.dto.CreditDebitRequest;
-import com.gsuretech.gsuretechbank.dto.EnquiryRequest;
-import com.gsuretech.gsuretechbank.dto.UserRequest;
+import com.gsuretech.gsuretechbank.dto.*;
 
 public interface UserService {
     BankResponse createAccount(UserRequest userRequest);
@@ -11,4 +8,5 @@ public interface UserService {
     String nameEnquiry(EnquiryRequest request);
     BankResponse creditAccount(CreditDebitRequest request);
     BankResponse debitAccount(CreditDebitRequest request);
+    BankResponse transfer(TransferRequest request);
 }
