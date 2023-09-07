@@ -1,10 +1,13 @@
 package com.gsuretech.gsuretechbank.service;
 
 import com.gsuretech.gsuretechbank.dto.*;
+import com.gsuretech.gsuretechbank.entity.Transaction;
 import com.gsuretech.gsuretechbank.entity.User;
+import com.gsuretech.gsuretechbank.repository.TransactionRepository;
 import com.gsuretech.gsuretechbank.repository.UserRepository;
 import com.gsuretech.gsuretechbank.utils.AccountUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,6 +21,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     EmailService emailService;
+
+    @Autowired
+    TransactionService transactionService;
 
     @Override
     public BankResponse createAccount(UserRequest userRequest) {
@@ -123,6 +129,14 @@ public class UserServiceImpl implements UserService {
         User userToCredit = userRepository.findByAccountNumber(request.getAccountNumber());
         userToCredit.setAccountBalance(userToCredit.getAccountBalance().add(request.getAmount()));
         userRepository.save(userToCredit);
+        //save transaction
+        TransactionDto transactionDto = TransactionDto.builder()
+                .accountNumber(userToCredit.getAccountNumber())
+                .transactionType("CREDIT")
+                .amount(request.getAmount())
+                .build();
+        transactionService.saveTransaction(transactionDto);
+
         EmailDetails emailDetails = EmailDetails.builder()
                 .recipient(userToCredit.getEmail())
                 .subject("ACCOUNT CREDITED")
@@ -169,6 +183,14 @@ public class UserServiceImpl implements UserService {
         } else {
             userToDebit.setAccountBalance(userToDebit.getAccountBalance().subtract(request.getAmount()));
             userRepository.save(userToDebit);
+
+            TransactionDto transactionDto = TransactionDto.builder()
+                    .accountNumber(userToDebit.getAccountNumber())
+                    .transactionType("DEBIT")
+                    .amount(request.getAmount())
+                    .build();
+            transactionService.saveTransaction(transactionDto);
+
             EmailDetails emailDetails = EmailDetails.builder()
                     .recipient(userToDebit.getEmail())
                     .subject("ACCOUNT DEBITED")
@@ -240,6 +262,14 @@ public class UserServiceImpl implements UserService {
                         " your new balance is " + sourceAccountUser.getAccountBalance())
                 .build();
         emailService.sendEmailAlert(debitAlert);
+
+        TransactionDto transactionDto = TransactionDto.builder()
+                .accountNumber(sourceAccountUser.getAccountNumber())
+                .transactionType("DEBIT")
+                .amount(request.getAmount())
+                .build();
+        transactionService.saveTransaction(transactionDto);
+
         return BankResponse.builder()
                 .responseCode(AccountUtils.TRANSFER_SUCCESS_CODE)
                 .responseMessage(AccountUtils.TRANSFER_SUCCESS_MESSAGE)
