@@ -251,7 +251,12 @@ public class UserServiceImpl implements UserService {
                         " your new balance is " + destinationAccountUser.getAccountBalance())
                 .build();
         emailService.sendEmailAlert(creditAlert);
-
+        TransactionDto transactionDto = TransactionDto.builder()
+                .accountNumber(destinationAccountUser.getAccountNumber())
+                .transactionType("CREDIT")
+                .amount(request.getAmount())
+                .build();
+        transactionService.saveTransaction(transactionDto);
         sourceAccountUser.setAccountBalance(sourceAccountUser.getAccountBalance().subtract(request.getAmount()));
 
         userRepository.save(sourceAccountUser);
@@ -263,12 +268,12 @@ public class UserServiceImpl implements UserService {
                 .build();
         emailService.sendEmailAlert(debitAlert);
 
-        TransactionDto transactionDto = TransactionDto.builder()
+        TransactionDto debitTransactionDto = TransactionDto.builder()
                 .accountNumber(sourceAccountUser.getAccountNumber())
                 .transactionType("DEBIT")
                 .amount(request.getAmount())
                 .build();
-        transactionService.saveTransaction(transactionDto);
+        transactionService.saveTransaction(debitTransactionDto);
 
         return BankResponse.builder()
                 .responseCode(AccountUtils.TRANSFER_SUCCESS_CODE)
