@@ -26,8 +26,8 @@ public class BankStatement {
         LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ISO_DATE);
         List<Transaction> transactionList = transactionRepository.findAll().stream()
                 .filter(transaction -> transaction.getAccountNumber().equals(accountNumber))
-                .filter(transaction -> transaction.getCreatedAt().isEqual(start.atStartOfDay()))
-                .filter(transaction -> transaction.getCreatedAt().isEqual(end.atStartOfDay()))
+                .filter(transaction -> transaction.getCreatedAt().isEqual(start))
+                .filter(transaction -> transaction.getCreatedAt().isEqual(end))
                 .toList();
         return transactionList;
     }
