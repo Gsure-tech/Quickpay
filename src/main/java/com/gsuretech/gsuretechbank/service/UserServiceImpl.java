@@ -257,7 +257,6 @@ public class UserServiceImpl implements UserService {
                 .amount(request.getAmount())
                 .build();
         transactionService.saveTransaction(transactionDto);
-
         sourceAccountUser.setAccountBalance(sourceAccountUser.getAccountBalance().subtract(request.getAmount()));
 
         userRepository.save(sourceAccountUser);
