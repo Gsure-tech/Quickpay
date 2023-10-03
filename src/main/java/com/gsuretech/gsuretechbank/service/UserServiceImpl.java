@@ -1,15 +1,11 @@
 package com.gsuretech.gsuretechbank.service;
 
 import com.gsuretech.gsuretechbank.dto.*;
-import com.gsuretech.gsuretechbank.entity.Transaction;
 import com.gsuretech.gsuretechbank.entity.User;
-import com.gsuretech.gsuretechbank.repository.TransactionRepository;
 import com.gsuretech.gsuretechbank.repository.UserRepository;
 import com.gsuretech.gsuretechbank.utils.AccountUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
