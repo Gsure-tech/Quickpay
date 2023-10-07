@@ -3,13 +3,11 @@ package com.gsuretech.gsuretechbank.service;
 import com.gsuretech.gsuretechbank.config.JwtTokenProvider;
 import com.gsuretech.gsuretechbank.dto.*;
 import com.gsuretech.gsuretechbank.entity.Role;
-import com.gsuretech.gsuretechbank.entity.Transaction;
 import com.gsuretech.gsuretechbank.entity.User;
-import com.gsuretech.gsuretechbank.repository.TransactionRepository;
 import com.gsuretech.gsuretechbank.repository.UserRepository;
 import com.gsuretech.gsuretechbank.utils.AccountUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +16,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -113,6 +115,30 @@ public class UserServiceImpl implements UserService {
                 .responseMessage(jwtTokenProvider.generateToken(authentication))
                 .build();
     }
+
+    @Override
+    public List<UsersDto> getUsers() {
+
+        List<User> userList = userRepository.findAll();
+        List<UsersDto>usersToReturn;
+
+        usersToReturn = userList.stream().map(user ->{
+            UsersDto usersDto = new UsersDto();
+            BeanUtils.copyProperties(user,usersDto);
+                return usersDto;
+        }).collect(Collectors.toList());
+        return usersToReturn;
+    }
+
+    @Override
+    public UsersDto getUser(long id) {
+       User user = userRepository.findById(id).get();
+         UsersDto usersDto = new UsersDto();
+         BeanUtils.copyProperties(user,usersDto);
+         return usersDto;
+
+    }
+
     //balance Enquiry, name Enquiry, credit, debit, transfer
     @Override
     public BankResponse balanceEnquiry(EnquiryRequest request) {
