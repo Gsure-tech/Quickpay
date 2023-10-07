@@ -1,6 +1,8 @@
 package com.gsuretech.gsuretechbank.service;
 
+import com.gsuretech.gsuretechbank.config.JwtTokenProvider;
 import com.gsuretech.gsuretechbank.dto.*;
+import com.gsuretech.gsuretechbank.entity.Role;
 import com.gsuretech.gsuretechbank.entity.Transaction;
 import com.gsuretech.gsuretechbank.entity.User;
 import com.gsuretech.gsuretechbank.repository.TransactionRepository;
@@ -8,6 +10,9 @@ import com.gsuretech.gsuretechbank.repository.UserRepository;
 import com.gsuretech.gsuretechbank.utils.AccountUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.TransientDataAccessResourceException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +32,13 @@ public class UserServiceImpl implements UserService {
     TransactionService transactionService;
 
     @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
     @Override
     public BankResponse createAccount(UserRequest userRequest) {
         /**
@@ -56,6 +67,7 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(userRequest.getPhoneNumber())
                 .alternativePhoneNumber(userRequest.getAlternativePhoneNumber())
                 .status("ACTIVE")
+                .role(Role.valueOf("ROLE_ADMIN"))
                 .build();
 
         User savedUser = userRepository.save(newUser);
@@ -82,7 +94,25 @@ public class UserServiceImpl implements UserService {
                         .build())
                 .build();
     }
+    @Override
+    public BankResponse login(LoginDto loginDto){
+        Authentication authentication = null;
+        authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+        );
 
+        EmailDetails loginAlert = EmailDetails.builder()
+                .subject("You are logged in!")
+                .recipient(loginDto.getEmail())
+                .messageBody("You logged into your account. If you didn't initiate this request, please contact your bank")
+                .build();
+
+        emailService.sendEmailAlert(loginAlert);
+        return BankResponse.builder()
+                .responseCode("Login Success")
+                .responseMessage(jwtTokenProvider.generateToken(authentication))
+                .build();
+    }
     //balance Enquiry, name Enquiry, credit, debit, transfer
     @Override
     public BankResponse balanceEnquiry(EnquiryRequest request) {

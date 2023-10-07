@@ -25,11 +25,15 @@ public class UserController {
             description = "HTTP Status 201 CREATED"
     )
     @PostMapping
-    public BankResponse createAccount(@RequestBody UserRequest userRequest){
+    public BankResponse createAccount(@RequestBody UserRequest userRequest) {
         return userService.createAccount(userRequest);
     }
 
+    @PostMapping("/login")
+    public BankResponse login(@RequestBody LoginDto loginDto){
+        return userService.login(loginDto);
 
+    }
     @Operation(
             summary = "Balance Enquiry",
             description = "Given an account number, check how much the user has"
@@ -39,7 +43,7 @@ public class UserController {
             description = "HTTP Status 200 SUCCESS"
     )
     @GetMapping("/balanceEnquiry")
-    public BankResponse balanceEnquiry(@RequestBody EnquiryRequest enquiryRequest){
+    public BankResponse balanceEnquiry(@RequestBody EnquiryRequest enquiryRequest) {
         return userService.balanceEnquiry(enquiryRequest);
     }
 
@@ -52,7 +56,7 @@ public class UserController {
             description = "HTTP Status 200 SUCCESS"
     )
     @GetMapping("/nameEnquiry")
-    public String nameEnquiry (@RequestBody EnquiryRequest enquiryRequest){
+    public String nameEnquiry(@RequestBody EnquiryRequest enquiryRequest) {
         return userService.nameEnquiry(enquiryRequest);
     }
 
@@ -65,7 +69,7 @@ public class UserController {
             description = "HTTP Status 200 CREATED"
     )
     @PostMapping("/credit")
-    public BankResponse creditAccount(@RequestBody CreditDebitRequest request){
+    public BankResponse creditAccount(@RequestBody CreditDebitRequest request) {
         return userService.creditAccount(request);
     }
 
@@ -78,7 +82,7 @@ public class UserController {
             description = "HTTP Status 200 CREATED"
     )
     @PostMapping("/debit")
-    public BankResponse debitAccount(@RequestBody CreditDebitRequest request){
+    public BankResponse debitAccount(@RequestBody CreditDebitRequest request) {
         return userService.debitAccount(request);
     }
 
@@ -91,7 +95,7 @@ public class UserController {
             description = "HTTP Status 200 CREATED"
     )
     @PostMapping("/transfer")
-    public BankResponse transer(@RequestBody TransferRequest request){
+    public BankResponse transer(@RequestBody TransferRequest request) {
         return userService.transfer(request);
     }
 }
