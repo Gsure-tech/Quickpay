@@ -1,12 +1,15 @@
 package com.gsuretech.gsuretechbank.controller;
 
 import com.gsuretech.gsuretechbank.dto.*;
+import com.gsuretech.gsuretechbank.entity.User;
 import com.gsuretech.gsuretechbank.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -30,10 +33,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public BankResponse login(@RequestBody LoginDto loginDto){
+    public BankResponse login(@RequestBody LoginDto loginDto) {
         return userService.login(loginDto);
 
     }
+
     @Operation(
             summary = "Balance Enquiry",
             description = "Given an account number, check how much the user has"
@@ -46,7 +50,14 @@ public class UserController {
     public BankResponse balanceEnquiry(@RequestBody EnquiryRequest enquiryRequest) {
         return userService.balanceEnquiry(enquiryRequest);
     }
-
+    @GetMapping("/getUser/{id}")
+    public UsersDto getUser(@PathVariable long id){
+        return userService.getUser(id);
+    }
+    @GetMapping("/getUsers")
+    public List<UsersDto> getUsers(){
+        return userService.getUsers();
+    }
     @Operation(
             summary = "Name Enquiry",
             description = "Given an account number, Get the username of the account"
