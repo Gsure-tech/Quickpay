@@ -33,10 +33,8 @@ public class User {
     private String phoneNumber;
     private String alternativePhoneNumber;
     private String status;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
-
     @UpdateTimestamp
     private LocalDateTime modifiedAt;
 }

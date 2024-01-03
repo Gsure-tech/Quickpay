@@ -247,7 +247,10 @@ public class UserServiceImpl implements UserService {
                         " your new balance is " + destinationAccountUser.getAccountBalance())
                 .build();
         emailService.sendEmailAlert(creditAlert);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9459dd739a3bf5a991abe406d0704b7af8af2c90
         TransactionDto transactionDto = TransactionDto.builder()
                 .accountNumber(destinationAccountUser.getAccountNumber())
                 .transactionType("CREDIT")
