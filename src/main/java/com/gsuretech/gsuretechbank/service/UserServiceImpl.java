@@ -1,13 +1,30 @@
 package com.gsuretech.gsuretechbank.service;
 
+import com.gsuretech.gsuretechbank.config.JwtTokenProvider;
 import com.gsuretech.gsuretechbank.dto.*;
+<<<<<<< HEAD
+=======
+import com.gsuretech.gsuretechbank.entity.Role;
+>>>>>>> b9fd0868fc1c1f26b4690fa9f33d55456a1f5dd8
 import com.gsuretech.gsuretechbank.entity.User;
 import com.gsuretech.gsuretechbank.repository.UserRepository;
 import com.gsuretech.gsuretechbank.utils.AccountUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+<<<<<<< HEAD
+=======
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+>>>>>>> b9fd0868fc1c1f26b4690fa9f33d55456a1f5dd8
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,6 +38,14 @@ public class UserServiceImpl implements UserService {
     @Autowired
     TransactionService transactionService;
 
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
     @Override
     public BankResponse createAccount(UserRequest userRequest) {
         /**
@@ -45,9 +70,11 @@ public class UserServiceImpl implements UserService {
                 .accountNumber(AccountUtils.generateAccountNumber())
                 .accountBalance(BigDecimal.ZERO)
                 .email(userRequest.getEmail())
+                .password(passwordEncoder.encode(userRequest.getPassword()))
                 .phoneNumber(userRequest.getPhoneNumber())
                 .alternativePhoneNumber(userRequest.getAlternativePhoneNumber())
                 .status("ACTIVE")
+                .role(Role.valueOf("ROLE_ADMIN"))
                 .build();
 
         User savedUser = userRepository.save(newUser);
@@ -73,6 +100,48 @@ public class UserServiceImpl implements UserService {
                         .accountName(savedUser.getFirstName() + " " + savedUser.getLastName() + " " + savedUser.getOtherName())
                         .build())
                 .build();
+    }
+    @Override
+    public BankResponse login(LoginDto loginDto){
+        Authentication authentication = null;
+        authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+        );
+
+        EmailDetails loginAlert = EmailDetails.builder()
+                .subject("You are logged in!")
+                .recipient(loginDto.getEmail())
+                .messageBody("You logged into your account. If you didn't initiate this request, please contact your bank")
+                .build();
+
+        emailService.sendEmailAlert(loginAlert);
+        return BankResponse.builder()
+                .responseCode("Login Success")
+                .responseMessage(jwtTokenProvider.generateToken(authentication))
+                .build();
+    }
+
+    @Override
+    public List<UsersDto> getUsers() {
+
+        List<User> userList = userRepository.findAll();
+        List<UsersDto>usersToReturn;
+
+        usersToReturn = userList.stream().map(user ->{
+            UsersDto usersDto = new UsersDto();
+            BeanUtils.copyProperties(user,usersDto);
+                return usersDto;
+        }).collect(Collectors.toList());
+        return usersToReturn;
+    }
+
+    @Override
+    public UsersDto getUser(long id) {
+       User user = userRepository.findById(id).get();
+         UsersDto usersDto = new UsersDto();
+         BeanUtils.copyProperties(user,usersDto);
+         return usersDto;
+
     }
 
     //balance Enquiry, name Enquiry, credit, debit, transfer
