@@ -22,7 +22,12 @@ public class OtpServiceImpl implements OtpService {
         //generate the otp
         //send the otp
         //save the otp
+        //check if he has an otp on our system
 
+        Otp existingOtp = otpRepository.findByEmail(otpRequest.getEmail());
+        if(existingOtp != null){
+            otpRepository.delete(existingOtp);
+        }
         String otp = AppUtils.generateOtp();
         log.info("Otp: {}", otp);
 
