@@ -59,7 +59,7 @@ public class OtpServiceImpl implements OtpService {
                     .responseMessage("You have not sent an otp")
                     .build();
         }
-        if (otp.getExpiredAt().isBefore(LocalDateTime.now())) {
+        if (otp.getExpiredAt().isBefore(LocalDateTime.now())){
             return BankResponse.builder()
                     .responseCode("400")
                     .responseMessage("Expired otp")
