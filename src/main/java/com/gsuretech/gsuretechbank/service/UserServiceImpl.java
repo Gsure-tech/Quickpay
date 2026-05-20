@@ -2,22 +2,16 @@ package com.gsuretech.gsuretechbank.service;
 
 import com.gsuretech.gsuretechbank.config.JwtTokenProvider;
 import com.gsuretech.gsuretechbank.dto.*;
-<<<<<<< HEAD
-=======
 import com.gsuretech.gsuretechbank.entity.Role;
->>>>>>> b9fd0868fc1c1f26b4690fa9f33d55456a1f5dd8
 import com.gsuretech.gsuretechbank.entity.User;
 import com.gsuretech.gsuretechbank.repository.UserRepository;
 import com.gsuretech.gsuretechbank.utils.AccountUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-<<<<<<< HEAD
-=======
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
->>>>>>> b9fd0868fc1c1f26b4690fa9f33d55456a1f5dd8
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -89,7 +83,7 @@ public class UserServiceImpl implements UserService {
                         savedUser.getOtherName() +
                         "\n Account Number: " + savedUser.getAccountNumber())
                 .build();
-        emailService.sendEmailAlert(emailDetails);
+//        emailService.sendEmailAlert(emailDetails);
 
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_CREATION_SUCCES)
@@ -114,7 +108,7 @@ public class UserServiceImpl implements UserService {
                 .messageBody("You logged into your account. If you didn't initiate this request, please contact your bank")
                 .build();
 
-        emailService.sendEmailAlert(loginAlert);
+//        emailService.sendEmailAlert(loginAlert);
         return BankResponse.builder()
                 .responseCode("Login Success")
                 .responseMessage(jwtTokenProvider.generateToken(authentication))
@@ -212,7 +206,7 @@ public class UserServiceImpl implements UserService {
                         " " + request.getAmount() + ".00" +
                         "\nyour new balance is " + userToCredit.getAccountBalance())
                 .build();
-        emailService.sendEmailAlert(emailDetails);
+//        emailService.sendEmailAlert(emailDetails);
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_CREDITED_SUCCESS)
                 .responseMessage(AccountUtils.ACCOUNT_CREDITED_SUCCESS_MESSAGE)
@@ -266,7 +260,7 @@ public class UserServiceImpl implements UserService {
                             "\nwith Account Number:" + userToDebit.getAccountNumber() + " " +
                             "\nyour new balance is " + userToDebit.getAccountBalance())
                     .build();
-            emailService.sendEmailAlert(emailDetails);
+//            emailService.sendEmailAlert(emailDetails);
         }
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_DEBITED_SUCCESS_CODE)
@@ -315,11 +309,8 @@ public class UserServiceImpl implements UserService {
                 .messageBody("The sum of " + request.getAmount() + " has been transferred to your account from "+ sourceUsername +
                         " your new balance is " + destinationAccountUser.getAccountBalance())
                 .build();
-        emailService.sendEmailAlert(creditAlert);
-<<<<<<< HEAD
+//        emailService.sendEmailAlert(creditAlert);
 
-=======
->>>>>>> 9459dd739a3bf5a991abe406d0704b7af8af2c90
         TransactionDto transactionDto = TransactionDto.builder()
                 .accountNumber(destinationAccountUser.getAccountNumber())
                 .transactionType("CREDIT")

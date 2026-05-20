@@ -51,8 +51,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize.requestMatchers(HttpMethod.POST, "/api/user").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "api/v1/otp/sendOtp").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/otp/sendOtp").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/otp/validateOtp").permitAll()
+                                .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui.html"
+                                ).permitAll()
+
                         .anyRequest().authenticated());
 
         httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
